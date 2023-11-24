@@ -50,7 +50,7 @@ class UserControllerTest extends Specification {
         ResponseEntity<HttpError> error = userController.handleException(new EmailException())
         expect:
         error.body.getCodigo() == 500
-        error.body.getDetail() == "Email Invalid"
+        error.body.getMensaje() == "Email Invalid"
     }
 
     def "Password Exception"() {

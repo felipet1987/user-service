@@ -14,5 +14,5 @@ import java.time.Instant;
 public class HttpError {
     private Instant timestamo;
     private int codigo;
-    private String detail;
+    private String mensaje;
 }

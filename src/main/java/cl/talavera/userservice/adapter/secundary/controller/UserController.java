@@ -40,7 +40,7 @@ public class UserController {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(HttpError.builder()
                         .codigo(500)
-                        .detail(e.getMessage())
+                        .mensaje(e.getMessage())
                         .timestamo(Instant.now())
                         .build());
     }
@@ -53,7 +53,7 @@ public class UserController {
                 .status(HttpStatus.NOT_FOUND)
                 .body(HttpError.builder()
                         .codigo(400)
-                        .detail(e.getMessage())
+                        .mensaje(e.getMessage())
                         .timestamo(Instant.now())
                         .build());
     }
