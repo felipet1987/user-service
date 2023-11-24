@@ -37,6 +37,37 @@ verify the application is running successfully:
 
 ```
 
+## DB Script
+
+for PhoneDao
+
+```
+CREATE TABLE phone (
+    id UUID PRIMARY KEY,
+    number VARCHAR(255),
+    citycode VARCHAR(255),
+    countrycode VARCHAR(255)
+);
+```
+
+
+for UserDao
+
+```
+CREATE TABLE user (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    password VARCHAR(255),
+    created DATE,
+    modified DATE,
+    last_login DATE,
+    token VARCHAR(255),
+    isActive BOOLEAN
+);
+```
+
+
 
 ## About the Service
 
