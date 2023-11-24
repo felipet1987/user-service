@@ -1,15 +1,13 @@
 package cl.talavera.userservice.core.service;
 
-import cl.talavera.userservice.adapter.secundary.repository.PhoneRepository;
-import cl.talavera.userservice.adapter.secundary.repository.UserRepository;
-import cl.talavera.userservice.adapter.secundary.repository.entity.PhoneDao;
-import cl.talavera.userservice.adapter.secundary.repository.entity.UserDao;
+
 import cl.talavera.userservice.config.security.JWTService;
 import cl.talavera.userservice.core.exception.EmailException;
-import cl.talavera.userservice.core.exception.ExistedException;
 import cl.talavera.userservice.core.exception.PasswordException;
+import cl.talavera.userservice.core.model.domain.User;
 import cl.talavera.userservice.core.model.UserSignUpRequest;
 import cl.talavera.userservice.core.model.UserSignUpResponse;
+import cl.talavera.userservice.core.port.IRepositoryHandler;
 import cl.talavera.userservice.core.port.IUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

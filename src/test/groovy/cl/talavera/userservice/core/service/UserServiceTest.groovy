@@ -1,14 +1,12 @@
 package cl.talavera.userservice.core.service
 
-import cl.talavera.userservice.adapter.secundary.repository.PhoneRepository
-import cl.talavera.userservice.adapter.secundary.repository.UserRepository
-import cl.talavera.userservice.adapter.secundary.repository.entity.PhoneDao
-import cl.talavera.userservice.adapter.secundary.repository.entity.UserDao
+import cl.talavera.userservice.adapter.secundary.repository.RepositoryHandler
 import cl.talavera.userservice.config.security.JWTService
 import cl.talavera.userservice.core.exception.EmailException
 import cl.talavera.userservice.core.exception.ExistedException
 import cl.talavera.userservice.core.exception.PasswordException
 import cl.talavera.userservice.core.model.PhoneRequest
+import cl.talavera.userservice.core.model.domain.User
 import cl.talavera.userservice.core.model.UserSignUpRequest
 import cl.talavera.userservice.core.model.UserSignUpResponse
 import spock.lang.Specification
@@ -18,8 +16,7 @@ import java.time.format.DateTimeFormatter
 
 class UserServiceTest extends Specification {
     UserService service;
-    UserRepository userRepository
-    PhoneRepository phoneRepository
+    RepositoryHandler repositoryHandler
     JWTService jwtService
     Clock clock
     RequestValidation requestValidation
@@ -34,13 +31,12 @@ class UserServiceTest extends Specification {
         clock = Clock.fixed(instant, ZoneId.systemDefault());
 
 
-        userRepository = Mock()
-        phoneRepository = Mock()
+        repositoryHandler = Mock()
         jwtService = Stub()
         requestValidation = Mock()
 
 
-        service = new UserService(userRepository, phoneRepository, clock, jwtService, requestValidation)
+        service = new UserService(clock, jwtService, requestValidation,repositoryHandler)
     }
 
     void cleanup() {
@@ -66,7 +62,7 @@ class UserServiceTest extends Specification {
 
         def now = LocalDate.now(clock)
         given:
-        UserDao user = UserDao.builder()
+        User user = User.builder()
                 .token("token")
                 .password("a2asfGfdfdf4")
                 .name("fulanito")
@@ -78,7 +74,7 @@ class UserServiceTest extends Specification {
                 .build()
 
         def uuid = UUID.randomUUID()
-        UserDao userMock = UserDao.builder()
+        User userMock = User.builder()
                 .token("token")
                 .name("fulanito")
                 .isActive(true)
@@ -90,9 +86,8 @@ class UserServiceTest extends Specification {
 
         jwtService.getJWTToken("fulanito") >> "token"
 
-        userRepository.save(user) >> userMock
+        repositoryHandler.saveUser(user) >> userMock
 
-        userRepository.findByEmail("email") >> Optional.empty()
         requestValidation.validPassword("a2asfGfdfdf4") >> true
         requestValidation.validMail("email") >> true
 
@@ -100,7 +95,7 @@ class UserServiceTest extends Specification {
         UserSignUpResponse response = service.signup(request)
 
         then:
-        1 * phoneRepository.save(PhoneDao.builder()
+        1 * repositoryHandler.savePhone(PhoneRequest.builder()
                 .citycode("")
                 .number("")
                 .countrycode("")
@@ -123,14 +118,14 @@ class UserServiceTest extends Specification {
                 .build();
 
 
+        repositoryHandler.findByEmail("email") >> {throw new ExistedException()}
 
-
-        userRepository.findByEmail("email") >> Optional.of(UserDao.builder().build())
 
         when:
         service.signup(request)
 
         then:
+
         thrown ExistedException
     }
 
@@ -141,7 +136,7 @@ class UserServiceTest extends Specification {
                 .name("fulanito")
                 .email("email")
                 .build();
-        userRepository.findByEmail("email") >> Optional.empty()
+
 
         requestValidation.validPassword("a2asfGfdfdf4") >> false
 
@@ -160,7 +155,6 @@ class UserServiceTest extends Specification {
                 .email("email")
                 .build();
 
-        userRepository.findByEmail("email") >> Optional.empty()
         requestValidation.validPassword("a2asfGfdfdf4") >> true
         requestValidation.validMail("email") >> false
 
