@@ -23,8 +23,7 @@ class UserControllerTest extends Specification {
         userController = new UserController(userService)
     }
 
-    void cleanup() {
-    }
+
 
     def "SignUp"() {
         UserSignUpRequest request = UserSignUpRequest.builder().build()
