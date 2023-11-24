@@ -77,7 +77,7 @@ Run the server and browse to
 [swagger-ui](http://localhost:8080/swagger-ui.html)
 
 ### UML Class Diagram
-![img_2.png](img_2.png)
+![img.png](img.png)
 
 
 
