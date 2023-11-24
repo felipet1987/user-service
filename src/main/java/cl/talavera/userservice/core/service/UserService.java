@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.Optional;
 
 
 @Service
@@ -34,12 +35,10 @@ public class UserService implements IUserService {
         String passwordPattern = "^(?=(?:[^0-9]*[0-9]){2})(?=.*[A-Z])[a-zA-Z0-9]{8,12}$";
         requestValidation.setPasswordPattern(passwordPattern);
 
-        UserDao existed = userRepository.findByEmail(request.getEmail());
-
-        if (existed != null) {
+        Optional<UserDao> byEmail = userRepository.findByEmail(request.getEmail());
+        byEmail.ifPresent(a -> {
             throw new ExistedException();
-        }
-
+        });
 
         if (!requestValidation.validPassword(request.getPassword())) {
             throw new PasswordException();

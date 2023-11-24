@@ -92,7 +92,7 @@ class UserServiceTest extends Specification {
 
         userRepository.save(user) >> userMock
 
-
+        userRepository.findByEmail("email") >> Optional.empty()
         requestValidation.validPassword("a2asfGfdfdf4") >> true
         requestValidation.validMail("email") >> true
 
@@ -125,7 +125,7 @@ class UserServiceTest extends Specification {
 
 
 
-        userRepository.findByEmail("email") >> UserDao.builder().build()
+        userRepository.findByEmail("email") >> Optional.of(UserDao.builder().build())
 
         when:
         service.signup(request)
@@ -141,7 +141,7 @@ class UserServiceTest extends Specification {
                 .name("fulanito")
                 .email("email")
                 .build();
-
+        userRepository.findByEmail("email") >> Optional.empty()
 
         requestValidation.validPassword("a2asfGfdfdf4") >> false
 
@@ -160,7 +160,7 @@ class UserServiceTest extends Specification {
                 .email("email")
                 .build();
 
-
+        userRepository.findByEmail("email") >> Optional.empty()
         requestValidation.validPassword("a2asfGfdfdf4") >> true
         requestValidation.validMail("email") >> false
 
