@@ -16,18 +16,16 @@ import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.LocalDate;
-import java.util.Optional;
 
 
 @Service
 @AllArgsConstructor
 public class UserService implements IUserService {
 
-    UserRepository userRepository;
-    PhoneRepository phoneRepository;
     Clock clock;
     JWTService jwtService;
     RequestValidation requestValidation;
+    IRepositoryHandler repositoryHandler;
 
 
     @Override
@@ -35,10 +33,8 @@ public class UserService implements IUserService {
         String passwordPattern = "^(?=(?:[^0-9]*[0-9]){2})(?=.*[A-Z])[a-zA-Z0-9]{8,12}$";
         requestValidation.setPasswordPattern(passwordPattern);
 
-        Optional<UserDao> byEmail = userRepository.findByEmail(request.getEmail());
-        byEmail.ifPresent(a -> {
-            throw new ExistedException();
-        });
+        repositoryHandler.findByEmail(request.getEmail());
+
 
         if (!requestValidation.validPassword(request.getPassword())) {
             throw new PasswordException();
@@ -51,7 +47,8 @@ public class UserService implements IUserService {
 
         LocalDate today = LocalDate.now(clock);
         String token = jwtService.getJWTToken(request.getName());
-        UserDao user = UserDao.builder()
+
+        User user = User.builder()
                 .token(token)
                 .password(request.getPassword())
                 .created(today)
@@ -63,15 +60,11 @@ public class UserService implements IUserService {
                 .build();
 
         request.getPhones().forEach(p -> {
-            phoneRepository.save(PhoneDao.builder()
-                    .countrycode(p.getCountrycode())
-                    .number(p.getNumber())
-                    .citycode(p.getCitycode())
-                    .build());
+            repositoryHandler.savePhone(p);
         });
 
 
-        UserDao userSaved = userRepository.save(user);
+        User userSaved = repositoryHandler.saveUser(user);
 
         return UserSignUpResponse.builder()
                 .id(userSaved.getId().toString())
